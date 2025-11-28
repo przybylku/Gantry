@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      # Wracamy do socketa, ale podłączonego "specjalnie"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      # To jest kluczowe dla Windowsa:
+      - type: npipe
+        source: \\.\pipe\docker_engine
+        target: /var/run/docker.sock
+    networks:
+      - gantry-net
+
+networks:
+  gantry-net:
+    external: true
